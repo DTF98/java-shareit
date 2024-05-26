@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.storage.UserStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,68 +24,56 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
 
     public List<ItemDto> getAllByOwner(Long userId) {
-        try {
-            userStorage.getById(userId);
-            return itemStorage.getAllByOwner(userId).stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        } catch (NullPointerException e) {
-            log.error("Пользователь по id = {} не найден", userId);
-            throw new NotFoundException(String.format("Не найден пользователь по id = %s", userId));
-        }
+        userStorage.getById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        return ItemMapper.toDto(itemStorage.getAllByOwner(userId));
     }
 
     public ItemDto getById(Long id, Long userId) {
-        try {
-            userStorage.getById(userId);
-            return ItemMapper.toItemDto(itemStorage.getById(id));
-        } catch (NullPointerException e) {
-            log.error("Пользователь по id = {} или вещь по id = {} не найдены", userId, id);
-            throw new NotFoundException(String.format("Не найден пользователь по id = %s или вещь по id = %s",
-                    userId, id));
-        }
+        userStorage.getById(userId);
+        return ItemMapper.toDto(itemStorage.getById(id).orElseThrow(() ->
+                new NotFoundException(String.format("Не найдена вещь по id = %s", id))));
     }
 
     public ItemDto add(Item item, Long userId) {
-        try {
-            userStorage.getById(userId);
-            item.setOwner(userId);
-            return ItemMapper.toItemDto(itemStorage.add(item));
-        } catch (NullPointerException e) {
-            log.error("Пользователь по id = {} не найден", userId);
-            throw new NotFoundException(String.format("Не найден пользователь по id = %s", userId));
-        }
+        userStorage.getById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        item.setOwner(userId);
+        return ItemMapper.toDto(itemStorage.add(item));
     }
 
     public ItemDto update(ItemDto itemDto, Long userId) {
-        try {
-            userStorage.getById(userId);
-            List<Item> items = itemStorage.getAllByOwner(userId);
-            if (items.size() == 1) itemDto.setId(items.get(0).getId());
-            Item itemUpdated = itemStorage.getById(itemDto.getId());
-            if (!Objects.equals(itemUpdated.getOwner(), userId)) {
-                log.error("Ошибка доступа, пользователь с id = {}, не может редактировать вещь по id = {}",
-                        userId, itemUpdated.getId());
-                throw new AccessException(String.format("Ошибка доступа, пользователь с id = %s, не может редактировать" +
-                        " вещь по id = %s", userId, itemUpdated.getId()));
-            }
-            return ItemMapper.toItemDto(itemStorage.update(itemDto));
-        } catch (NullPointerException e) {
-            log.error("Пользователь по id = {} или вещь не найдены", userId);
-            throw new NotFoundException(String.format("Не найден пользователь по id = %s или вещь", userId));
+        userStorage.getById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+
+        /*
+          Делаю проверку на то, что у пользователя всего одна вещь, если не передан id айтема
+        */
+        List<Item> items = new ArrayList<>();
+        if (itemDto.getId() == null) {
+            items = itemStorage.getAllByOwner(userId);
         }
+        if (items.size() == 1) {
+            itemDto.setId(items.get(0).getId());
+        }
+
+        Item itemUpdated = itemStorage.getById(itemDto.getId()).orElseThrow(() ->
+                new NotFoundException(String.format("Не найдена вещь по id = %s", itemDto.getId())));
+        if (!Objects.equals(itemUpdated.getOwner(), userId)) {
+            log.error("Ошибка доступа, пользователь с id = {}, не может редактировать вещь по id = {}",
+                    userId, itemUpdated.getId());
+            throw new AccessException(String.format("Ошибка доступа, пользователь с id = %s, не может редактировать" +
+                    " вещь по id = %s", userId, itemUpdated.getId()));
+        }
+        return ItemMapper.toDto(itemStorage.update(itemDto));
     }
 
     public List<ItemDto> searchItems(String text, Long userId) {
-        try {
-            userStorage.getById(userId);
-            if (text.isEmpty()) return new ArrayList<>();
-            return itemStorage.searchItemsByNameAndDescription(text).stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        } catch (NullPointerException e) {
-            log.error("Пользователь по id = {} не найден", userId);
-            throw new NotFoundException(String.format("Не найден пользователь по id = %s", userId));
+        userStorage.getById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        if (text.isEmpty()) {
+            return new ArrayList<>();
         }
+        return ItemMapper.toDto(itemStorage.searchItemsByNameOrDescription(text));
     }
 }

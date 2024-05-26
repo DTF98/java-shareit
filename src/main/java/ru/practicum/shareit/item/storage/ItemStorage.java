@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,8 +23,8 @@ public class ItemStorage {
                 .collect(Collectors.toList());
     }
 
-    public Item getById(Long id) {
-        return storage.get(id);
+    public Optional<Item> getById(Long id) {
+        return Optional.ofNullable(storage.get(id));
     }
 
     public Item add(Item item) {
@@ -35,14 +36,20 @@ public class ItemStorage {
 
     public Item update(ItemDto itemDto) {
         Item updatedItem = storage.get(itemDto.getId());
-        if (itemDto.getName() != null) updatedItem.setName(itemDto.getName());
-        if (itemDto.getDescription() != null) updatedItem.setDescription(itemDto.getDescription());
-        if (itemDto.getAvailable() != null) updatedItem.setAvailable(itemDto.getAvailable());
+        if (itemDto.getName() != null) {
+            updatedItem.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null) {
+            updatedItem.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getAvailable() != null) {
+            updatedItem.setAvailable(itemDto.getAvailable());
+        }
         storage.put(updatedItem.getId(), updatedItem);
         return storage.get(itemDto.getId());
     }
 
-    public List<Item> searchItemsByNameAndDescription(String text) {
+    public List<Item> searchItemsByNameOrDescription(String text) {
         return storage.values().stream()
                 .filter((a) -> (a.getName().toLowerCase().contains(text) ||
                         a.getDescription().toLowerCase().contains(text)) && a.getAvailable())

@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -19,9 +20,8 @@ public class UserStorage {
         return new ArrayList<>(storage.values());
     }
 
-    public User getById(Long id) {
-        if (storage.containsKey(id)) return storage.get(id);
-        else throw new NullPointerException("Не найден пользователь");
+    public Optional<User> getById(Long id) {
+        return Optional.ofNullable(storage.get(id));
     }
 
     public User add(User user) {
@@ -33,13 +33,26 @@ public class UserStorage {
 
     public User update(UserDto userDto) {
         User updatedUser = storage.get(userDto.getId());
-        if (userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());
-        if (userDto.getName() != null) updatedUser.setName(userDto.getName());
+        if (userDto.getEmail() != null) {
+            updatedUser.setEmail(userDto.getEmail());
+        }
+        if (userDto.getName() != null) {
+            updatedUser.setName(userDto.getName());
+        }
         storage.put(updatedUser.getId(), updatedUser);
         return storage.get(updatedUser.getId());
     }
 
     public User delete(Long id) {
         return storage.remove(id);
+    }
+
+    public boolean isExistEmail(String email) {
+        return storage.values().stream()
+                .anyMatch((a) -> a.getEmail().equals(email));
+    }
+
+    public String getEmailById(Long id) {
+        return storage.get(id).getEmail();
     }
 }

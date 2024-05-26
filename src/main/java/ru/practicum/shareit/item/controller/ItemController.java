@@ -17,39 +17,39 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemService service;
+    private final ItemService itemService;
 
     @GetMapping
     public ResponseEntity<Collection<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получение всех вещей пользователя по id = {}",userId);
-        return ResponseEntity.ok(service.getAllByOwner(userId));
+        return ResponseEntity.ok(itemService.getAllByOwner(userId));
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                            @PathVariable Long itemId) {
         log.info("Получение вещи по id = {} пользователем по id = {}",itemId, userId);
-        return ResponseEntity.ok(service.getById(itemId, userId));
+        return ResponseEntity.ok(itemService.getById(itemId, userId));
     }
 
     @PostMapping
     public ResponseEntity<ItemDto> create(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @Valid @RequestBody Item item) {
         log.info("Добавление вещи пользователем по id = {}", userId);
-        return ResponseEntity.ok(service.add(item, userId));
+        return ResponseEntity.ok(itemService.add(item, userId));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @RequestBody ItemDto itemDto) {
         log.info("Обновление вещи пользователем по id = {}", userId);
-        return ResponseEntity.ok(service.update(itemDto, userId));
+        return ResponseEntity.ok(itemService.update(itemDto, userId));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @RequestParam("text") String text) {
         log.info("Поиск вещей по названию и описанию: {}, пользователем по id = {}", text, userId);
-        return ResponseEntity.ok(service.searchItems(text.toLowerCase(), userId));
+        return ResponseEntity.ok(itemService.searchItems(text.toLowerCase(), userId));
     }
 }
