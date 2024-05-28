@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.ArrayList;
@@ -24,31 +25,24 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
 
     public List<ItemDto> getAllByOwner(Long userId) {
-        userStorage.getById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        getUserById(userId);
         return ItemMapper.toDto(itemStorage.getAllByOwner(userId));
     }
 
     public ItemDto getById(Long id, Long userId) {
-        userStorage.getById(userId);
+        getUserById(userId);
         return ItemMapper.toDto(itemStorage.getById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Не найдена вещь по id = %s", id))));
     }
 
     public ItemDto add(Item item, Long userId) {
-        userStorage.getById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        getUserById(userId);
         item.setOwner(userId);
         return ItemMapper.toDto(itemStorage.add(item));
     }
 
     public ItemDto update(ItemDto itemDto, Long userId) {
-        userStorage.getById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
-
-        /*
-          Делаю проверку на то, что у пользователя всего одна вещь, если не передан id айтема
-        */
+        getUserById(userId);
         List<Item> items = new ArrayList<>();
         if (itemDto.getId() == null) {
             items = itemStorage.getAllByOwner(userId);
@@ -56,7 +50,6 @@ public class ItemServiceImpl implements ItemService {
         if (items.size() == 1) {
             itemDto.setId(items.get(0).getId());
         }
-
         Item itemUpdated = itemStorage.getById(itemDto.getId()).orElseThrow(() ->
                 new NotFoundException(String.format("Не найдена вещь по id = %s", itemDto.getId())));
         if (!Objects.equals(itemUpdated.getOwner(), userId)) {
@@ -69,11 +62,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<ItemDto> searchItems(String text, Long userId) {
-        userStorage.getById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Не найден пользователь по id = %s", userId)));
+        getUserById(userId);
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
         return ItemMapper.toDto(itemStorage.searchItemsByNameOrDescription(text));
+    }
+
+    private User getUserById(Long id) {
+        return userStorage.getById(id).orElseThrow(() ->
+                new NotFoundException(String.format("Не найден пользователь по id = %s", id)));
     }
 }

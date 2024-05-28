@@ -17,38 +17,43 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserStorage storage;
+    private final UserStorage userStorage;
 
     public List<UserDto> getAll() {
-        return UserMapper.toDto(storage.getAll());
+        return UserMapper.toDto(userStorage.getAll());
     }
 
     public UserDto getById(Long id) {
-        return UserMapper.toDto(storage.getById(id).orElseThrow(() ->
+        return UserMapper.toDto(userStorage.getById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Не найден пользователь по id = %s", id))));
     }
 
     public UserDto add(User user) {
-        if (storage.isExistEmail(user.getEmail())) {
+        if (userStorage.isExistEmail(user.getEmail())) {
             throw new ValidationException("Пользователь с таким email уже существует!");
         }
-        User userAdd = storage.add(user);
+        User userAdd = userStorage.add(user);
         return UserMapper.toDto(userAdd);
     }
 
     public UserDto update(UserDto userDto, Long userId) {
-        if (storage.isExistEmail(userDto.getEmail())) {
-            if (!storage.getEmailById(userId).equals(userDto.getEmail())) {
-                throw new ValidationException("Пользователь с таким email уже существует!");
-            }
-        }
-        getById(userId);
-        userDto.setId(userId);
-        return UserMapper.toDto(storage.update(userDto));
+        UserDto userUpdate = checkUserForUpdate(userDto, userId);
+        return UserMapper.toDto(userStorage.update(userUpdate));
     }
 
     public UserDto delete(Long id) {
         getById(id);
-        return UserMapper.toDto(storage.delete(id));
+        return UserMapper.toDto(userStorage.delete(id));
+    }
+
+    private UserDto checkUserForUpdate(UserDto userDto, Long userId) {
+        getById(userId);
+        if (userStorage.isExistEmail(userDto.getEmail())) {
+            if (!userStorage.getEmailById(userId).equals(userDto.getEmail())) {
+                throw new ValidationException("Пользователь с таким email уже существует!");
+            }
+        }
+        userDto.setId(userId);
+        return userDto;
     }
 }

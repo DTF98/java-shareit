@@ -16,35 +16,35 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService service;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<Collection<UserDto>> getAll() {
         log.info("Получение списка всех пользователей");
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(userService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
         log.info("Получение пользователя по id = {}", id);
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(userService.getById(id));
     }
 
     @PostMapping
     public ResponseEntity<UserDto> create(@Valid @RequestBody User user) {
         log.info("Добавление пользователя: {}", user);
-        return ResponseEntity.ok(service.add(user));
+        return ResponseEntity.ok(userService.add(user));
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDto> update(@RequestBody UserDto userDto, @PathVariable Long userId) {
         log.info("Обновление пользователя по id = {}", userId);
-        return ResponseEntity.ok(service.update(userDto, userId));
+        return ResponseEntity.ok(userService.update(userDto, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserDto> delete(@PathVariable Long id) {
         log.info("Удаление пользователя по id = {}", id);
-        return ResponseEntity.ok(service.delete(id));
+        return ResponseEntity.ok(userService.delete(id));
     }
 }
