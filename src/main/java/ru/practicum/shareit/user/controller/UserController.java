@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validation.ValidationGroup;
 
@@ -15,8 +14,9 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping(path = "/users")
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
+@Validated
 public class UserController {
     private final UserService userService;
 

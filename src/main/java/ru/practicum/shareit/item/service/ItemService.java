@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ItemService {
-    Collection<ItemDto> getAllByOwner(Long userId);
+    Collection<AdvancedItemDto> getAllByOwner(Long userId);
 
-    ItemDto getById(Long id, Long userId);
+    AdvancedItemDto getById(Long id, Long userId);
 
     ItemDto add(ItemDto itemDto, Long userId);
 

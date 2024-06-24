@@ -17,19 +17,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/items")
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<Collection<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Collection<AdvancedItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получение всех вещей пользователя по id = {}",userId);
         return ResponseEntity.ok(itemService.getAllByOwner(userId));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<AdvancedItemDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                    @PathVariable Long itemId) {
         log.info("Получение вещи по id = {} пользователем по id = {}",itemId, userId);
         return ResponseEntity.ok(itemService.getById(itemId, userId));

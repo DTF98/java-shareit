@@ -1,24 +1,26 @@
 package ru.practicum.shareit.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
 @Value
 @RequiredArgsConstructor
 @Builder
-public class BookingDtoOut {
-
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class AdvancedBookingDto {
+    @EqualsAndHashCode.Include
     Long id;
 
-    ItemDto item;
+    Long bookerId;
 
-    UserDto booker;
+    @JsonIgnore
+    Long itemId;
 
     BookingStatus status;
 

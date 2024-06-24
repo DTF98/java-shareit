@@ -18,7 +18,7 @@ public enum BookingState {
             try {
                 bookingState = BookingState.valueOf(str);
             } catch (IllegalArgumentException e) {
-                throw new ValidationException(String.format("Неизвестное состояние: %s", str));
+                throw new ValidationException(String.format("Unknown state: %s", str));
             }
         }
         return bookingState;

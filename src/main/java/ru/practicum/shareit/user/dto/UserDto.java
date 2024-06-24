@@ -8,9 +8,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
-@AllArgsConstructor
+@Value
 @RequiredArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserDto {
     @EqualsAndHashCode.Include
     @Null
@@ -22,6 +23,7 @@ public class UserDto {
 
     @NotNull(groups = ValidationGroup.Create.class)
     @Size(min = 1)
-    @Email
+    @Email(message = "Неверный формат почты", regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+            + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     String email;
 }

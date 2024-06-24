@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import ru.practicum.shareit.booking.model.BookingStatus;
-//import ru.practicum.shareit.validation.ValidBookingInterval;
+import ru.practicum.shareit.validation.ValidBookingInterval;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
@@ -15,8 +15,10 @@ import java.time.LocalDateTime;
 @Value
 @RequiredArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ValidBookingInterval(message = "Некорректное время бронирования")
 public class BookingDtoIn {
-
+    @EqualsAndHashCode.Include
     @Null
     Long id;
 
