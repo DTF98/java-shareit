@@ -50,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public Collection<AdvancedItemDto> getAllByOwner(Long userId) {
         getUserById(userId);
-        List<Item> listItems = itemRepository.findAllByOwnerId(userId, Item.class);
+        List<Item> listItems = itemRepository.findAllByOwnerId(userId);
         Set<Long> itemIds = listItems.stream().map(Item::getId).collect(Collectors.toSet());
         Map<Long, List<Comment>> commentsMapping = getItemCommentMapping(itemIds);
         Map<Long, List<Booking>> lastBookingMapping = bookingService.getItemLastBookingMapping(itemIds);
@@ -91,8 +91,9 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(text,
-                text, true, ItemDto.class);
+        List<Item> items = itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(text,
+                text, true);
+        return itemMapper.toListItemDto(items);
     }
 
     @Transactional
@@ -105,13 +106,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     private User getUserById(Long id) {
-        return userRepository.findById(id, User.class).orElseThrow(
+        return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь по id = %s не найден!", id)));
     }
 
     @Transactional(readOnly = true)
     private Item getItemById(Long id) {
-        return itemRepository.findById(id, Item.class).orElseThrow(
+        return itemRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Вещь по id = %s не найдена!", id)));
     }
 

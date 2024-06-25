@@ -7,8 +7,9 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
-public interface BookingRepository extends JpaRepository<Booking, Long>, AdvancedBookingRepository {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT bk FROM Booking bk JOIN FETCH bk.item i JOIN FETCH bk.booker u " +
             "WHERE u.id = :bookerId ORDER BY bk.start DESC")
     List<Booking> findBookingsForUserAll(Long bookerId);
@@ -48,6 +49,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Advance
     @Query(value = "SELECT bk FROM Booking bk JOIN FETCH bk.item i JOIN FETCH bk.booker u " +
             "WHERE i.ownerId = :ownerId AND bk.status = :status ORDER BY bk.start DESC")
     List<Booking> findBookingsForItemOwnerStatus(Long ownerId, BookingStatus status);
+
+    @Query(value = "SELECT DISTINCT ON (item_id) bk.* FROM bookings bk WHERE bk.item_id IN :itemIds AND " +
+            "(bk.date_end < :time OR bk.date_start < :time AND bk.date_end > :time) AND bk.status = :status " +
+            "ORDER BY bk.date_end DESC", nativeQuery = true)
+    List<Booking> findLastBookingWithStatus(Set<Long> itemIds, LocalDateTime time, String status);
+
+    @Query(value = "SELECT DISTINCT ON (item_id) bk.* FROM bookings bk WHERE bk.item_id IN :itemIds AND " +
+            "bk.date_start > :time AND bk.status = :status ORDER BY bk.date_start", nativeQuery = true)
+    List<Booking> findNextBookingWithStatus(Set<Long> itemIds, LocalDateTime time, String status);
 
     List<Booking> findAllByItemIdAndBookerIdAndEndBefore(Long itemId, Long bookerId, LocalDateTime dateTime);
 }

@@ -19,6 +19,8 @@ public interface ItemMapper {
 
     ItemDto toItemDto(Item item);
 
+    List<ItemDto> toListItemDto(List<Item> items);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "ownerId", ignore = true)
     @Mapping(target = "requestId", ignore = true)

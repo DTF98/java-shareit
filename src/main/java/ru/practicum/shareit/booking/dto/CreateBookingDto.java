@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ValidBookingInterval(message = "Некорректное время бронирования")
-public class BookingDtoIn {
+public class CreateBookingDto {
     @EqualsAndHashCode.Include
     @Null
     Long id;

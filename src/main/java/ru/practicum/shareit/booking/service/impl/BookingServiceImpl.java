@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoIn;
+import ru.practicum.shareit.booking.dto.CreateBookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -34,16 +34,16 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Transactional
-    public BookingDto createBooking(Long userId, BookingDtoIn bookingDtoIn) {
+    public BookingDto createBooking(Long userId, CreateBookingDto createBookingDto) {
         User user = getUserById(userId);
-        Item item = getItemById(bookingDtoIn.getItemId());
+        Item item = getItemById(createBookingDto.getItemId());
         if (!item.getAvailable()) {
             throw new UnavailableForBookingException("Предмет недоступен для бронирования");
         }
         if (Objects.equals(item.getOwnerId(), userId)) {
             throw new NotFoundException("Невозможно забронировать свой предмет");
         }
-        Booking booking = bookingMapper.toModel(bookingDtoIn, user, item);
+        Booking booking = bookingMapper.toModel(createBookingDto, user, item);
         booking.setStatus(BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
         return bookingMapper.toDto(savedBooking);
@@ -139,7 +139,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         Map<Long, List<Booking>> lastBookingMapping;
         lastBookingMapping = bookingRepository
-                .findLastBookingWithStatus(itemIds, now, BookingStatus.APPROVED)
+                .findLastBookingWithStatus(itemIds, now, BookingStatus.APPROVED.toString())
                 .stream().collect(Collectors.groupingBy(b -> b.getItem().getId()));
         return lastBookingMapping;
     }
@@ -149,7 +149,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         Map<Long, List<Booking>> nextBookingMapping;
         nextBookingMapping = bookingRepository
-                .findNextBookingWithStatus(itemIds, now, BookingStatus.APPROVED).stream()
+                .findNextBookingWithStatus(itemIds, now, BookingStatus.APPROVED.toString()).stream()
                 .collect(Collectors.groupingBy(b -> b.getItem().getId()));
         return nextBookingMapping;
     }
@@ -160,12 +160,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private User getUserById(Long userId) {
-        return userRepository.findById(userId, User.class).orElseThrow(
+        return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь по id = %s не найден!", userId)));
     }
 
     private Item getItemById(Long itemId) {
-        return itemRepository.findById(itemId, Item.class).orElseThrow(
+        return itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Вещь по id = %s не найдена!", itemId)));
     }
 }

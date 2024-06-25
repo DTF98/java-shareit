@@ -1,6 +1,6 @@
 package ru.practicum.shareit.validation;
 
-import ru.practicum.shareit.booking.dto.BookingDtoIn;
+import ru.practicum.shareit.booking.dto.CreateBookingDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -10,7 +10,7 @@ public class ValidBookingIntervalValidator implements ConstraintValidator<ValidB
     @Override
     public boolean isValid(final Object value, final ConstraintValidatorContext context) {
         try {
-            BookingDtoIn bookingCreateDto = (BookingDtoIn) value;
+            CreateBookingDto bookingCreateDto = (CreateBookingDto) value;
             LocalDateTime start = bookingCreateDto.getStart();
             LocalDateTime end = bookingCreateDto.getEnd();
             LocalDateTime now = LocalDateTime.now();

@@ -22,13 +22,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getAll() {
-        return userRepository.findBy(UserDto.class);
+        return userMapper.toListUserDto(userRepository.findAll());
     }
 
     @Transactional(readOnly = true)
     public UserDto getById(Long id) {
-        return userRepository.findById(id, UserDto.class).orElseThrow(() ->
+        User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Не найден пользователь по id = %s", id)));
+        return userMapper.toDto(user);
     }
 
     @Transactional
