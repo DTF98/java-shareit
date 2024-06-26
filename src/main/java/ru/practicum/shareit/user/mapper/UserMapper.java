@@ -1,24 +1,23 @@
 package ru.practicum.shareit.user.mapper;
 
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    UserDto toDto(User user);
 
-    public static UserDto toDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
-    }
+    User toModel(UserDto userDto);
 
-    public static List<UserDto> toDto(List<User> users) {
-        return users.stream()
-                .map(UserMapper::toDto)
-                .collect(Collectors.toList());
-    }
+    List<UserDto> toListUserDto(List<User> users);
+
+    public
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User updateModel(@MappingTarget User user, UserDto updaterUserDto);
 }
