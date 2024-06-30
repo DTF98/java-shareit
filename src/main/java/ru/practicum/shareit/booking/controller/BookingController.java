@@ -2,19 +2,23 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.CreateBookingDto;
+import ru.practicum.shareit.booking.dto.create.CreateBookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -27,16 +31,20 @@ public class BookingController {
 
     @GetMapping
     public Collection<BookingDto> getBookingsByState(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                     @RequestParam(required = false) String state) {
+                                                     @RequestParam(required = false) String state,
+                                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение списка бронирований пользователя userId={}, по состоянию = {}", userId, state);
-        return bookingService.getBookingsForUser(userId, BookingState.parseState(state));
+        return bookingService.getBookingsForUser(userId, BookingState.parseState(state), from, size);
     }
 
     @GetMapping("/owner")
     public Collection<BookingDto> getBookingsByStateOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                          @RequestParam(required = false) String state) {
+                                                          @RequestParam(required = false) String state,
+                                                          @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                          @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение списка бронирований владельцем userId={}, по состоянию = {}", userId, state);
-        return bookingService.getBookingsForItemOwner(userId, BookingState.parseState(state));
+        return bookingService.getBookingsForItemOwner(userId, BookingState.parseState(state), from, size);
     }
 
     @PostMapping

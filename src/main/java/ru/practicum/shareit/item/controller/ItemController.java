@@ -12,6 +12,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.ValidationGroup;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,9 +26,11 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<Collection<AdvancedItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Collection<AdvancedItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                              @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                              @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение всех вещей пользователя по id = {}",userId);
-        return ResponseEntity.ok(itemService.getAllByOwner(userId));
+        return ResponseEntity.ok(itemService.getAllByOwner(userId, from, size));
     }
 
     @GetMapping("/{itemId}")
@@ -46,10 +50,11 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestParam("text") String text) {
-        log.info("Поиск вещей по названию и описанию: {}, пользователем по id = {}", text, userId);
-        return ResponseEntity.ok(itemService.searchItems(text.toLowerCase(), userId));
+    public ResponseEntity<List<ItemDto>> searchItem(@RequestParam("text") String text,
+                                                    @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                    @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Поиск доступных предметов text={}", text);
+        return ResponseEntity.ok(itemService.searchItems(text.toLowerCase(), from, size));
     }
 
     @Validated({ValidationGroup.Create.class})

@@ -8,7 +8,8 @@ public enum BookingState {
     PAST,
     FUTURE,
     WAITING,
-    REJECTED;
+    REJECTED,
+    UNKNOWN;
 
     public static BookingState parseState(String str) {
         BookingState bookingState;
