@@ -1,29 +1,30 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.validation.ValidationGroup;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
-@AllArgsConstructor
-@Getter
-@Setter
+@Value
+@RequiredArgsConstructor
+@Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ItemDto {
     @Null(groups = ValidationGroup.Create.class)
-    private Long id;
+    Long id;
 
     @NotNull(groups = ValidationGroup.Create.class)
     @Size(min = 2, max = 30)
-    private String name;
+    String name;
 
     @NotNull(groups = ValidationGroup.Create.class)
     @Size(min = 2, max = 200)
-    private String description;
+    String description;
 
     @NotNull(groups = ValidationGroup.Create.class)
-    private Boolean available;
+    Boolean available;
+
+    Long requestId;
 }

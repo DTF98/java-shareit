@@ -2,10 +2,12 @@ package ru.practicum.shareit.booking.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.CreateBookingDto;
+import ru.practicum.shareit.booking.dto.create.CreateBookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -75,27 +78,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<BookingDto> getBookingsForUser(Long userId, BookingState state) {
+    public Collection<BookingDto> getBookingsForUser(Long userId, BookingState state, int from, int size) {
         getUserById(userId);
+        Pageable page = Pagination.getPage(from, size, Sort.by("start").descending());
         List<Booking> result;
         switch (state) {
             case ALL:
-                result = bookingRepository.findBookingsForUserAll(userId);
+                result = bookingRepository.findBookingsForUserAll(userId, page);
                 break;
             case CURRENT:
-                result = bookingRepository.findBookingsForUserCurrent(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForUserCurrent(userId, LocalDateTime.now(), page);
                 break;
             case PAST:
-                result = bookingRepository.findBookingsForUserPast(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForUserPast(userId, LocalDateTime.now(), page);
                 break;
             case FUTURE:
-                result = bookingRepository.findBookingsForUserFuture(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForUserFuture(userId, LocalDateTime.now(), page);
                 break;
             case WAITING:
-                result = bookingRepository.findBookingsForUserByStatus(userId, BookingStatus.WAITING);
+                result = bookingRepository.findBookingsForUserByStatus(userId, BookingStatus.WAITING, page);
                 break;
             case REJECTED:
-                result = bookingRepository.findBookingsForUserByStatus(userId, BookingStatus.REJECTED);
+                result = bookingRepository.findBookingsForUserByStatus(userId, BookingStatus.REJECTED, page);
                 break;
             default:
                 log.warn("Unknown state: {}", state);
@@ -105,27 +109,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<BookingDto> getBookingsForItemOwner(Long userId, BookingState state) {
+    public Collection<BookingDto> getBookingsForItemOwner(Long userId, BookingState state, int from, int size) {
         getUserById(userId);
+        Pageable page = Pagination.getPage(from, size, Sort.by("start").descending());
         List<Booking> result;
         switch (state) {
             case ALL:
-                result = bookingRepository.findBookingsForItemOwnerAll(userId);
+                result = bookingRepository.findBookingsForItemOwnerAll(userId, page);
                 break;
             case CURRENT:
-                result = bookingRepository.findBookingsForItemOwnerCurrent(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForItemOwnerCurrent(userId, LocalDateTime.now(), page);
                 break;
             case PAST:
-                result = bookingRepository.findBookingsForItemOwnerPast(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForItemOwnerPast(userId, LocalDateTime.now(), page);
                 break;
             case FUTURE:
-                result = bookingRepository.findBookingsForItemOwnerFuture(userId, LocalDateTime.now());
+                result = bookingRepository.findBookingsForItemOwnerFuture(userId, LocalDateTime.now(), page);
                 break;
             case WAITING:
-                result = bookingRepository.findBookingsForItemOwnerStatus(userId, BookingStatus.WAITING);
+                result = bookingRepository.findBookingsForItemOwnerStatus(userId, BookingStatus.WAITING, page);
                 break;
             case REJECTED:
-                result = bookingRepository.findBookingsForItemOwnerStatus(userId, BookingStatus.REJECTED);
+                result = bookingRepository.findBookingsForItemOwnerStatus(userId, BookingStatus.REJECTED, page);
                 break;
             default:
                 log.warn("Unknown state: {}", state);

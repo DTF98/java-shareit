@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS comments, bookings, items, users;
-
+DROP TABLE IF EXISTS comments, bookings, items, users, requests;
 CREATE TABLE IF NOT EXISTS users
 (
     id    BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
@@ -48,4 +47,15 @@ CREATE TABLE IF NOT EXISTS comments
     PRIMARY KEY (id),
     FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
     FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS requests
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    description VARCHAR(255)                        NOT NULL,
+    user_id     BIGINT                              NOT NULL,
+    created     TIMESTAMP WITHOUT TIME ZONE         NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

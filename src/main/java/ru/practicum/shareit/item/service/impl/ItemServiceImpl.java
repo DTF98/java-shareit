@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -23,6 +24,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,9 +50,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<AdvancedItemDto> getAllByOwner(Long userId) {
+    public Collection<AdvancedItemDto> getAllByOwner(Long userId, int from, int size) {
         getUserById(userId);
-        List<Item> listItems = itemRepository.findAllByOwnerId(userId);
+        Pageable page = Pagination.getPage(from, size);
+        List<Item> listItems = itemRepository.findAllByOwnerId(userId, page);
         Set<Long> itemIds = listItems.stream().map(Item::getId).collect(Collectors.toSet());
         Map<Long, List<Comment>> commentsMapping = getItemCommentMapping(itemIds);
         Map<Long, List<Booking>> lastBookingMapping = bookingService.getItemLastBookingMapping(itemIds);
@@ -86,13 +89,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItems(String text, Long userId) {
-        getUserById(userId);
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
+        Pageable page = Pagination.getPage(from, size);
         List<Item> items = itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(text,
-                text, true);
+                text, true, page);
         return itemMapper.toListItemDto(items);
     }
 
@@ -134,7 +137,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional(readOnly = true)
-    private Map<Long, List<Comment>> getItemCommentMapping(Set<Long> itemIds) {
+    public Map<Long, List<Comment>> getItemCommentMapping(Set<Long> itemIds) {
         Map<Long, List<Comment>> commentMapping;
         commentMapping = commentRepository.findAllByItemIdIn(itemIds)
                 .stream().collect(Collectors.groupingBy(Comment::getItemId));

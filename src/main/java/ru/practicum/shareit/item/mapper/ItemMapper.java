@@ -38,6 +38,8 @@ public interface ItemMapper {
     @Mapping(target = "authorName", source = "comment.author.name")
     CommentDto toCommentDto(Comment comment);
 
+    Item toItemFromAdvanced(AdvancedItemDto advancedItemDto, Long requestId);
+
     default List<AdvancedItemDto> toExtendInfoDto(List<Item> items, Map<Long, List<Comment>> commentMapping,
                                                         Map<Long, List<Booking>> lastBookingMapping, Map<Long, List<Booking>> nextBookingMapping) {
         LinkedList<AdvancedItemDto> result = new LinkedList<>();

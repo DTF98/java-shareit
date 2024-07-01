@@ -1,28 +1,25 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import ru.practicum.shareit.item.dto.ItemForRequestDto;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Value
-@Getter
 @RequiredArgsConstructor
 @Builder(toBuilder = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class ItemRequestDto {
+public class AdvancedRequestItemDto {
     @EqualsAndHashCode.Include
-    @Null
     Long id;
 
-    @NotNull
-    @Size(min = 2, max = 200)
     String description;
 
-    @Null
     LocalDateTime created;
 
-
+    Collection<ItemForRequestDto> items;
 }

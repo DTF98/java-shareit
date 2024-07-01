@@ -7,6 +7,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -16,6 +17,8 @@ public interface UserMapper {
     User toModel(UserDto userDto);
 
     List<UserDto> toListUserDto(List<User> users);
+
+    Collection<User> toCol(Collection<UserDto> users);
 
     public
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

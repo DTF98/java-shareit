@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.booking.dto.create;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
