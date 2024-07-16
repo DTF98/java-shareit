@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto createComment(@RequestBody @Valid CommentDto commentDto,
+    public CommentDto createComment(@RequestBody CommentDto commentDto,
                                     @PathVariable Long itemId,
                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Создание отзыва comment={} на предмет itemId={} от пользователя userId={}", commentDto, itemId, userId);
